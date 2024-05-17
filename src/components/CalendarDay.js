@@ -4,35 +4,57 @@ import { fetchEventsByDate } from '../services/api';
 import ErrorBanner from './ErrorBanner';
 import LoadingSpinner from './LoadingSpinner';
 import Event from './Event';
+import EventInput from './EventInput';
 import { findOverlappingEvents } from '../utils/findOverlappingEvents';
 
 const CalendarDay = ({ calendarDate }) => {
   const [events, setEvents] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedStartTime, setSelectedStartTime] = useState(null);
+  const [hoveredBlock, setHoveredBlock] = useState(null);
 
-  // Fetch events for the selected date
-  // on mount and whenever the date changes
-  // keep the calendar in a loading state until the events are fetched
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const data = await fetchEventsByDate(calendarDate);
-        const processedEvents = findOverlappingEvents(data || []);
-        setEvents(processedEvents);
-      } catch (error) {
-        // Handle the error by displaying an error banner
-        setError('Failed to fetch events. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchEvents();
   }, [calendarDate]);
 
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchEventsByDate(calendarDate);
+      const processedEvents = findOverlappingEvents(data || []);
+      setEvents(processedEvents);
+    } catch (error) {
+      setError('Failed to fetch events. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleCloseError = () => {
     setError(null);
+  };
+
+  const handleSaveEvent = () => {
+    fetchEvents();
+  };
+
+  const handleBlockClick = (hour) => {
+    const formattedHour = hour.toString().padStart(2, '0') + ':00';
+    setSelectedStartTime(formattedHour);
+  };
+
+  const handleMouseOverBlock = (hour) => {
+    setHoveredBlock(hour);
+  };
+
+  const handleMouseLeaveBlock = () => {
+    setHoveredBlock(null);
+  };
+
+  const handleMouseOverEvent = (event) => {
+    event.stopPropagation();
+    setHoveredBlock(null);
   };
 
   const formattedDate = calendarDate.toLocaleDateString('en-US', {
@@ -41,12 +63,8 @@ const CalendarDay = ({ calendarDate }) => {
     year: 'numeric',
   });
 
-  // Height of each hour block in pixels
-  // we are setting this using JS to coordinate the event component height with 
-  // the height of the hour blocks. I don't love this and would like to revisit it
   const hourBlockHeight = 60;
 
-  // Filter events for the given hour and map them to Event components
   const getEventsForHour = (hour) => {
     return events
       .filter(event => {
@@ -65,20 +83,24 @@ const CalendarDay = ({ calendarDate }) => {
               left: `${10 + (event.position * (widthPerEvent + 5))}%`, // Add 10px margin
               width: `${widthPerEvent}%`
             }}
+            onMouseOver={handleMouseOverEvent}
+            onMouseLeave={(e) => e.stopPropagation()}
           />
         );
       });
   };
 
-  // Generate 24 hour blocks for the day
   const generateHourBlocks = () => {
     return Array.from({ length: 24 }, (_, hour) => {
       const eventsForHour = getEventsForHour(hour);
       return (
         <div 
           key={hour} 
-          className={`hourBlock ${eventsForHour.length > 0 ? 'scheduled' : ''}`} 
+          className={`hourBlock ${eventsForHour.length > 0 ? 'scheduled' : ''} ${hoveredBlock === hour ? 'hover' : ''}`} 
           style={{ height: `${hourBlockHeight}px` }}
+          onClick={() => handleBlockClick(hour)}
+          onMouseOver={() => handleMouseOverBlock(hour)}
+          onMouseLeave={handleMouseLeaveBlock}
         >
           <div className="hourLabel">{`${hour % 12 || 12} ${hour < 12 ? 'AM' : 'PM'}`}</div>
           {eventsForHour}
@@ -88,9 +110,15 @@ const CalendarDay = ({ calendarDate }) => {
   };
 
   return (
-    <div className="calendarDay">
+    <div className="calendarDay" data-testid="calendar-day">
       <div className="header">
         <div className="date">{formattedDate}</div>
+        <EventInput 
+          onSave={handleSaveEvent} 
+          defaultStartTime={selectedStartTime} 
+          onError={setError} 
+          setLoading={setLoading}
+        />
       </div>
       {error && <ErrorBanner message={error} onClose={handleCloseError} />}
       <div className="hoursContainer" style={{ height: `${hourBlockHeight * 24}px` }}>

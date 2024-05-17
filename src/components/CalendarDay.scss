@@ -7,23 +7,24 @@
   height: 100%;
   font-family: 'Roboto', sans-serif;
   background-color: #ffffff;
-  justify-content: center;
   align-items: center;
 
   .header {
     display: flex;
-    justify-content: center;
-    padding: 16px;
-    border-bottom: 1px solid #e0e0e0;
+    flex-direction: column;
+    width: 100%;
+    background-color: #fff;
     position: sticky;
     top: 0;
-    z-index: 1;
-    width: 100%;
+    z-index: 2;
+    border-bottom: 1px solid #e0e0e0;
 
     .date {
+      text-align: center;
       font-size: 24px;
       font-weight: 500;
       color: #3c4043;
+      padding: 10px 0;
     }
   }
 
@@ -31,6 +32,7 @@
     width: 80%;
     flex-grow: 1;
     overflow-y: auto;
+    margin: 0 auto;
 
     .hourBlock {
       display: flex;
@@ -39,6 +41,7 @@
       border-top: 1px solid #e0e0e0;
       background-color: #ffffff;
       transition: background-color 0.3s;
+      cursor: pointer;
 
       &:first-of-type {
         margin-top: 10px;
@@ -57,10 +60,10 @@
         background-color: #ffffff;
         padding-right: 5px; /* Ensure some padding to the right for better readability */
       }
-    }
 
-    .hourBlock:hover:not(.scheduled) {
-      background-color: #e8f0fe;
+      &.hover {
+        background-color: #e8f0fe;
+      }
     }
   }
 

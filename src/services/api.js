@@ -1,49 +1,35 @@
 // Dummy events data
-const dummyEvents = [
-  {
-    date: new Date(),
-    startTime: '09:00',
-    endTime: '10:00',
-    name: 'Morning Meeting',
-  },
-  {
-    date: new Date(),
-    startTime: '11:00',
-    endTime: '13:00',
-    name: 'Project Update',
-  },
-  {
-    date: new Date(),
-    startTime: '12:00',
-    endTime: '13:00',
-    name: 'Lunch & Learn',
-  },
-  {
-    date: new Date(),
-    startTime: '14:00',
-    endTime: '15:00',
-    name: 'Client Call',
-  },
-  {
-    date: new Date(),
-    startTime: '16:00',
-    endTime: '17:00',
-    name: 'Team Sync-up',
-  },
-];
+let sessionEvents = [];
 
 export async function fetchEventsByDate(calendarDate) {
   console.log("fetching calendar events for date:", calendarDate, ". returning mock data");
   try {
     // Simulate an API call with a delay
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Simulate an error by uncommenting the following line
     //throw new Error('Failed to fetch events. Please try again later.');
 
-    return dummyEvents;
+    return sessionEvents;
   } catch (error) {
     console.error('Error fetching calendar events:', error);
+    throw error; // Re-throw the error to propagate it, so that CalendarDay can handle it
+  }
+}
+
+export async function addEvent(event) {
+  console.log("saving event:", event, ". just saving locally because call is mocked");
+  try {
+    // Simulate an API call with a delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Simulate an error by uncommenting the following line
+    //throw new Error('Failed to fetch events. Please try again later.');
+
+    sessionEvents.push(event);
+    return;
+  } catch (error) {
+    console.error('Error adding calendar event:', error);
     throw error; // Re-throw the error to propagate it, so that CalendarDay can handle it
   }
 }
