@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './EventInput.scss';
-import { addEvent, updateEvent } from '../services/api';
+import { addEvent, updateEvent, deleteEvent } from '../services/api';
 
 const EventInput = ({ onSave, defaultStartTime, selectedEvent, onError, setLoading }) => {
   const [startTime, setStartTime] = useState('');
@@ -90,6 +90,22 @@ const EventInput = ({ onSave, defaultStartTime, selectedEvent, onError, setLoadi
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      setLoading(true);
+      await deleteEvent(selectedEvent.id); // Assuming deleteEvent is a function in the API
+      onSave(null);
+      setStartTime('');
+      setEndTime('');
+      setName('');
+    } catch (error) {
+      console.log("Error deleting event:", error);
+      onError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const handleTimeChange = (setter) => (e) => {
     const value = e.target.value;
     const [hours, minutes] = value.split(':');
@@ -127,6 +143,7 @@ const EventInput = ({ onSave, defaultStartTime, selectedEvent, onError, setLoadi
         placeholder="Event Name"
       />
       <button onClick={handleSave}>Save</button>
+      {selectedEvent && <button className="deleteButton" onClick={handleDelete}>Delete</button>}
     </div>
   );
 };
