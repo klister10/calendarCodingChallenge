@@ -35,7 +35,7 @@
     .hourBlock {
       display: flex;
       position: relative;
-      height: 40px;  /* Adjusted height of the blocks */
+      height: 60px;  /* Adjusted height of the blocks */
       border-top: 1px solid #e0e0e0;
       background-color: #ffffff;
       transition: background-color 0.3s;
@@ -61,6 +61,20 @@
         background-color: #ffffff;
         padding-right: 5px; /* Ensure some padding to the right for better readability */
       }
+
+      .eventName {
+        margin-top: 20px;
+        padding-left: 16px;
+        font-size: 16px;
+        color: #333;
+      }
     }
+  }
+
+  .loading {
+    font-size: 16px;
+    color: #666;
+    text-align: center;
+    padding: 20px;
   }
 }
