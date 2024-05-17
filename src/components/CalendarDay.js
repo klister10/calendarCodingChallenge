@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './CalendarDay.scss';
 import { fetchEventsByDate } from '../services/api';
 import ErrorBanner from './ErrorBanner';
@@ -13,10 +13,20 @@ const CalendarDay = ({ calendarDate }) => {
   const [loading, setLoading] = useState(true);
   const [selectedStartTime, setSelectedStartTime] = useState(null);
   const [hoveredBlock, setHoveredBlock] = useState(null);
+  const hoursContainerRef = useRef(null);
 
   useEffect(() => {
     fetchEvents();
   }, [calendarDate]);
+
+  useEffect(() => {
+    // Scroll to 9 AM after the component mounts
+    if (hoursContainerRef.current) {
+      const hourBlockHeight = 60; // Height of each hour block in pixels
+      const scrollPosition = hourBlockHeight * 9; // 9 AM is the 10th block (index 9)
+      hoursContainerRef.current.scrollTop = scrollPosition;
+    }
+  }, [loading]);
 
   const fetchEvents = async () => {
     try {
@@ -121,7 +131,7 @@ const CalendarDay = ({ calendarDate }) => {
         />
       </div>
       {error && <ErrorBanner message={error} onClose={handleCloseError} />}
-      <div className="hoursContainer" style={{ height: `${hourBlockHeight * 24}px` }}>
+      <div className="hoursContainer" ref={hoursContainerRef} style={{ height: `${hourBlockHeight * 24}px` }}>
         {loading ? (
           <LoadingSpinner />
         ) : (
