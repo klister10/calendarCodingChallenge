@@ -40,10 +40,6 @@
       background-color: #ffffff;
       transition: background-color 0.3s;
 
-      &:hover {
-        background-color: #e8f0fe;
-      }
-
       &:first-of-type {
         margin-top: 10px;
       }
@@ -61,13 +57,10 @@
         background-color: #ffffff;
         padding-right: 5px; /* Ensure some padding to the right for better readability */
       }
+    }
 
-      .eventName {
-        margin-top: 20px;
-        padding-left: 16px;
-        font-size: 16px;
-        color: #333;
-      }
+    .hourBlock:hover:not(.scheduled) {
+      background-color: #e8f0fe;
     }
   }
 

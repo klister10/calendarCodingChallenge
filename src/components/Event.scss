@@ -1,0 +1,20 @@
+.event {
+  position: absolute;   
+  left: 7%;
+  right: 2%;
+  background-color: #4285f4;
+  color: #ffffff;
+  border-radius: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  line-height: 1.5;
+  z-index: 2;
+
+  .eventTitle {
+    position: absolute;
+    left: calc(50% - 100px);
+    width: 200px;
+    top: 6px;
+  }
+}
