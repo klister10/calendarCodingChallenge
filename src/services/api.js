@@ -14,6 +14,12 @@ const dummyEvents = [
   },
   {
     date: new Date(),
+    startTime: '12:00',
+    endTime: '13:00',
+    name: 'Lunch & Learn',
+  },
+  {
+    date: new Date(),
     startTime: '14:00',
     endTime: '15:00',
     name: 'Client Call',

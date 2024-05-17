@@ -4,6 +4,7 @@ import { fetchEventsByDate } from '../services/api';
 import ErrorBanner from './ErrorBanner';
 import LoadingSpinner from './LoadingSpinner';
 import Event from './Event';
+import { findOverlappingEvents } from '../utils/findOverlappingEvents';
 
 const CalendarDay = ({ calendarDate }) => {
   const [events, setEvents] = useState([]);
@@ -17,7 +18,8 @@ const CalendarDay = ({ calendarDate }) => {
     const fetchEvents = async () => {
       try {
         const data = await fetchEventsByDate(calendarDate);
-        setEvents(data || []);
+        const processedEvents = findOverlappingEvents(data || []);
+        setEvents(processedEvents);
       } catch (error) {
         // Handle the error by displaying an error banner
         setError('Failed to fetch events. Please try again later.');
@@ -52,8 +54,18 @@ const CalendarDay = ({ calendarDate }) => {
         return eventStartHour === hour;
       })
       .map((event, index) => {
+        const totalOverlap = event.totalOverlap;
+        const widthPerEvent = (100 - 20 - (totalOverlap - 1) * 5) / totalOverlap; // Subtract 20px for margins and 5px for each gap
         return (
-          <Event key={index} event={event} hourBlockHeight={hourBlockHeight} />
+          <Event 
+            key={index} 
+            event={event} 
+            hourBlockHeight={hourBlockHeight}
+            style={{
+              left: `${10 + (event.position * (widthPerEvent + 5))}%`, // Add 10px margin
+              width: `${widthPerEvent}%`
+            }}
+          />
         );
       });
   };

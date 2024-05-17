@@ -1,7 +1,7 @@
 import React from 'react';
 import './Event.scss';
 
-const Event = ({ event, hourBlockHeight }) => {
+const Event = ({ event, hourBlockHeight, style }) => {
   const eventStartHour = parseInt(event.startTime.split(':')[0], 10);
   const eventEndHour = parseInt(event.endTime.split(':')[0], 10);
   const eventDuration = eventEndHour - eventStartHour;
@@ -9,7 +9,10 @@ const Event = ({ event, hourBlockHeight }) => {
   return (
     <div 
       className="event" 
-      style={{ height: `${eventDuration * hourBlockHeight}px` }}
+      style={{ 
+        height: `${eventDuration * hourBlockHeight}px`,
+        ...style
+      }}
     >
       <span className="eventTitle">{event.name}</span>
     </div>
