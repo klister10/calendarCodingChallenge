@@ -15,7 +15,10 @@ const CalendarDay = ({ calendarDate }) => {
   const [hoveredBlock, setHoveredBlock] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const hoursContainerRef = useRef(null);
+  const hourBlockHeight = 60;
 
+  // Fetch events on mount and when the calendar date changes
+  // for now, the calendar date will never change
   useEffect(() => {
     fetchEvents();
   }, [calendarDate]);
@@ -23,12 +26,13 @@ const CalendarDay = ({ calendarDate }) => {
   useEffect(() => {
     // Scroll to 9 AM after the component mounts
     if (hoursContainerRef.current) {
-      const hourBlockHeight = 60; // Height of each hour block in pixels
       const scrollPosition = hourBlockHeight * 9; // 9 AM is the 10th block (index 9)
       hoursContainerRef.current.scrollTop = scrollPosition;
     }
   }, [loading]);
 
+  // Fetch events for the selected date
+  // handle error and loading states
   const fetchEvents = async () => {
     try {
       setLoading(true);
@@ -43,11 +47,15 @@ const CalendarDay = ({ calendarDate }) => {
     }
   };
 
+  // closes the error message when the user clicks the x button
   const handleCloseError = () => {
     setError(null);
   };
 
-  const handleSaveEvent = async (newEvent) => {
+  // callback for after the save button is clicked in the input
+  // for now, all it does is fetch the updated events
+  // this will be called after an add, update, or delete event
+  const handleSaveEvent = async () => {
     if (selectedEvent) {
       // clear selected event
       setSelectedEvent(null);
@@ -55,12 +63,18 @@ const CalendarDay = ({ calendarDate }) => {
     fetchEvents();
   };
 
+  // callback for when a block is clicked
+  // this resets the selected event and sets the selected start time
   const handleBlockClick = (hour) => {
     const formattedHour = hour.toString().padStart(2, '0') + ':00';
     setSelectedEvent(null);
     setSelectedStartTime(formattedHour);
   };
 
+  // sets the hovered block when the mouse is over a block
+  // this allows us to apply a hover style 
+  // this is done this way instead of using css hover because we don't want to 
+  // apply the hover style to blocks when child events are being hovered on
   const handleMouseOverBlock = (hour) => {
     setHoveredBlock(hour);
   };
@@ -69,6 +83,7 @@ const CalendarDay = ({ calendarDate }) => {
     setHoveredBlock(null);
   };
 
+  // prevents the block from being hovered when an event is hovered
   const handleMouseOverEvent = (event) => {
     event.stopPropagation();
     setHoveredBlock(null);
@@ -78,14 +93,14 @@ const CalendarDay = ({ calendarDate }) => {
     setSelectedEvent(event);
   };
 
+  // format the date to be displayed in the header
   const formattedDate = calendarDate.toLocaleDateString('en-US', {
     month: 'long',
     day: 'numeric',
     year: 'numeric',
   });
 
-  const hourBlockHeight = 60;
-
+  // get all events for a given hour
   const getEventsForHour = (hour) => {
     return events
       .filter(event => {
@@ -93,6 +108,7 @@ const CalendarDay = ({ calendarDate }) => {
         return eventStartHour === hour;
       })
       .map((event, index) => {
+        // style the events based on the pre-processing we did to find overlapping events
         const totalOverlap = event.totalOverlap;
         const widthPerEvent = (100 - 20 - (totalOverlap - 1) * 5) / totalOverlap; // Subtract 20px for margins and 5px for each gap
         return (
@@ -101,7 +117,7 @@ const CalendarDay = ({ calendarDate }) => {
             event={event} 
             hourBlockHeight={hourBlockHeight}
             style={{
-              left: `${10 + (event.position * (widthPerEvent + 5))}%`, // Add 10px margin
+              left: `${10 + (event.position * (widthPerEvent + 5))}%`, // Add margin
               width: `${widthPerEvent}%`
             }}
             onMouseOver={handleMouseOverEvent}
@@ -112,6 +128,7 @@ const CalendarDay = ({ calendarDate }) => {
       });
   };
 
+  // generate the 24 hour blocks for the day
   const generateHourBlocks = () => {
     return Array.from({ length: 24 }, (_, hour) => {
       const eventsForHour = getEventsForHour(hour);

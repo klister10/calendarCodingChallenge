@@ -1,6 +1,11 @@
 // Dummy events data
 let sessionEvents = [];
 
+// Mock API functions
+// These functions simulate API calls by using setTimeout to delay the response
+
+
+// Fetch events for a given date
 export async function fetchEventsByDate(calendarDate) {
   console.log("fetching calendar events for date:", calendarDate, ". returning mock data");
   try {
@@ -17,6 +22,7 @@ export async function fetchEventsByDate(calendarDate) {
   }
 }
 
+// Add a new event, for now just save it locally
 export async function addEvent(event) {
   console.log("saving event:", event, ". just saving locally because call is mocked");
   try {
@@ -36,7 +42,7 @@ export async function addEvent(event) {
   }
 }
 
-
+// Update an existing event, for now just update it locally
 export async function updateEvent(eventId, newEvent) {
   console.log("in updateEvent:", newEvent, ". just updating locally because call is mocked");
   try {
@@ -61,6 +67,7 @@ export async function updateEvent(eventId, newEvent) {
   }
 }
 
+// Delete an event, for now just delete it locally
 export async function deleteEvent(eventId) {
   console.log("in deleteEvent:", eventId, ". just deleting locally because call is mocked");
   try {
