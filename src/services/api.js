@@ -30,7 +30,7 @@ export async function fetchEventsByDate(calendarDate) {
   console.log("fetching calendar events for date:", calendarDate, ". returning mock data");
   try {
     // Simulate an API call with a delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     return dummyEvents;
   } catch (error) {

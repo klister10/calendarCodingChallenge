@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './CalendarDay.scss';
 import { fetchEventsByDate } from '../services/api';
 import ErrorBanner from './ErrorBanner';
+import LoadingSpinner from './LoadingSpinner';
 
 const CalendarDay = ({ calendarDate }) => {
   const [events, setEvents] = useState([]);
@@ -33,6 +34,27 @@ const CalendarDay = ({ calendarDate }) => {
     year: 'numeric',
   });
 
+  const getEventForHour = (hour) => {
+    return events.filter((event) => {
+      const eventHour = parseInt(event.startTime.split(':')[0], 10);
+      return eventHour === hour;
+    })
+    .map((event, index) => (
+      <div key={index} className="eventName">
+        {event.name}
+      </div>
+    ));
+  }
+
+  const generateHourBlocks = () => {
+    return Array.from({ length: 24 }, (_, hour) => (
+      <div key={hour} className="hourBlock">
+        <div className="hourLabel">{`${hour % 12 || 12} ${hour < 12 ? 'AM' : 'PM'}`}</div>
+        {getEventForHour(hour)}
+      </div>
+    ))
+  }
+
   return (
     <div className="calendarDay">
       <div className="header">
@@ -40,25 +62,12 @@ const CalendarDay = ({ calendarDate }) => {
       </div>
       {error && <ErrorBanner message={error} onClose={handleCloseError} />}
       <div className="hoursContainer">
-        {loading ? (
-          <div className="loading">Loading...</div>
-        ) : (
-          Array.from({ length: 24 }, (_, hour) => (
-            <div key={hour} className="hourBlock">
-              <div className="hourLabel">{`${hour % 12 || 12} ${hour < 12 ? 'AM' : 'PM'}`}</div>
-              {events
-                .filter((event) => {
-                  const eventHour = parseInt(event.startTime.split(':')[0], 10);
-                  return eventHour === hour;
-                })
-                .map((event, index) => (
-                  <div key={index} className="eventName">
-                    {event.name}
-                  </div>
-                ))}
-            </div>
-          ))
-        )}
+        {loading &&
+          <LoadingSpinner />
+        }  
+        {!loading &&
+          generateHourBlocks()
+        }
       </div>
     </div>
   );
