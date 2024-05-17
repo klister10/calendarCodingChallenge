@@ -32,4 +32,13 @@
       background-color: #357ae8;
     }
   }
+
+  .deleteButton {
+    background-color: #FF4136;
+    color: #fff;
+
+    &:hover {
+      background-color: #e60000;
+    }
+  }
 }

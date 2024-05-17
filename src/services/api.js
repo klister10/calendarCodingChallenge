@@ -36,22 +36,42 @@ export async function addEvent(event) {
   }
 }
 
+
 export async function updateEvent(eventId, newEvent) {
-  console.log("in updateEvent:", newEvent, ". just updateing locally because call is mocked");
+  console.log("in updateEvent:", newEvent, ". just updating locally because call is mocked");
   try {
     // Simulate an API call with a delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Simulate an error by uncommenting the following line
-    //throw new Error('Failed to fetch events. Please try again later.');
+    //throw new Error('Failed to update event. Please try again later.');
 
-    // replace the event in sessionEvents that has an id which matches event.id with event. 
+    // replace the event in sessionEvents that has an id which matches eventId with newEvent. 
     // If there is no event in sessionEvents that has a matching id, throw an error
     const index = sessionEvents.findIndex(e => e.id === eventId);
     if (index === -1) {
       throw new Error('Event not found');
     }
     sessionEvents[index] = newEvent;
+    return;
+
+  } catch (error) {
+    console.error('Error adding calendar event:', error);
+    throw error; // Re-throw the error to propagate it, so that CalendarDay can handle it
+  }
+}
+
+export async function deleteEvent(eventId) {
+  console.log("in deleteEvent:", eventId, ". just deleting locally because call is mocked");
+  try {
+    // Simulate an API call with a delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Simulate an error by uncommenting the following line
+    //throw new Error('Failed to delete. Please try again later.');
+
+    // remove the event from sessionEvents that has an id which matches eventId
+    sessionEvents = sessionEvents.filter(e => e.id !== eventId);
     return;
 
   } catch (error) {
