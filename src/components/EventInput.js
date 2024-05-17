@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './EventInput.scss';
-import { addEvent } from '../services/api';
+import { addEvent, updateEvent } from '../services/api';
 
-const EventInput = ({ onSave, defaultStartTime, onError, setLoading }) => {
-  const [startTime, setStartTime] = useState(defaultStartTime);
+const EventInput = ({ onSave, defaultStartTime, selectedEvent, onError, setLoading }) => {
+  const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [name, setName] = useState('');
   const startTimeInputRef = useRef(null);
-  const endTimeInputRef = useRef(null);
 
   useEffect(() => {
     setStartTime(defaultStartTime);
@@ -15,6 +14,18 @@ const EventInput = ({ onSave, defaultStartTime, onError, setLoading }) => {
       startTimeInputRef.current.focus();
     }
   }, [defaultStartTime]);
+
+  useEffect(() => {
+    if (!selectedEvent) {
+      setEndTime('');
+      setStartTime('');
+      setName('');
+      return;
+    }
+    setEndTime(selectedEvent.endTime);
+    setStartTime(selectedEvent.startTime);
+    setName(selectedEvent.name);
+  }, [selectedEvent]);
 
   useEffect(() => {
     // Unfocus the input on mount
@@ -33,15 +44,15 @@ const EventInput = ({ onSave, defaultStartTime, onError, setLoading }) => {
   };
 
   const validateInput = () => {
-    if (!isValidTime(startTime)) {
+    if (!startTime || !isValidTime(startTime)) {
       onError('Start time must be an exact hour (e.g., 14:00).');
       return false;
     }
-    if (!isValidTime(endTime)) {
+    if (!endTime || !isValidTime(endTime)) {
       onError('End time must be an exact hour (e.g., 15:00).');
       return false;
     }
-    if (!isValidName(name)) {
+    if (!name || !isValidName(name)) {
       onError('Event name must be a non-empty string.');
       return false;
     }
@@ -52,16 +63,22 @@ const EventInput = ({ onSave, defaultStartTime, onError, setLoading }) => {
       return false;
     }
     return true;
-  };  
+  };
 
   const handleSave = async () => {
     if (validateInput()) {
       const newEvent = { startTime, endTime, name };
       try {
         setLoading(true);
-        await addEvent(newEvent);
-        onSave();
-        setStartTime(defaultStartTime);
+        if(selectedEvent) {
+          // Update the event
+          await updateEvent(selectedEvent.id, newEvent); // Assuming updateEvent is a function in the API
+          // setSelectedEvent(null);
+        } else {
+          await addEvent(newEvent);
+        }
+        onSave(newEvent);
+        setStartTime('');
         setEndTime('');
         setName('');
       } catch (error) {
@@ -87,7 +104,6 @@ const EventInput = ({ onSave, defaultStartTime, onError, setLoading }) => {
     <div className="eventInput">
       <input 
         className="timeInput"
-        id="startTimeInput"
         type="time" 
         value={startTime} 
         onChange={handleTimeChange(setStartTime)}
@@ -102,7 +118,6 @@ const EventInput = ({ onSave, defaultStartTime, onError, setLoading }) => {
         onChange={handleTimeChange(setEndTime)}
         step="3600" 
         placeholder="End Time"
-        ref={endTimeInputRef}
       />
       <input 
         className="nameInput"
