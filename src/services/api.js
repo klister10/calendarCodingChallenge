@@ -9,7 +9,7 @@ const dummyEvents = [
   {
     date: new Date(),
     startTime: '11:00',
-    endTime: '12:00',
+    endTime: '13:00',
     name: 'Project Update',
   },
   {
@@ -31,6 +31,9 @@ export async function fetchEventsByDate(calendarDate) {
   try {
     // Simulate an API call with a delay
     await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // Simulate an error by uncommenting the following line
+    //throw new Error('Failed to fetch events. Please try again later.');
 
     return dummyEvents;
   } catch (error) {
