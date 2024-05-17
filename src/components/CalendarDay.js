@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './CalendarDay.scss';
-import { fetchEventsByDate } from '../services/api';
+import { fetchEventsByDate } from '../services/api'; 
 import ErrorBanner from './ErrorBanner';
 import LoadingSpinner from './LoadingSpinner';
 import Event from './Event';
@@ -13,6 +13,7 @@ const CalendarDay = ({ calendarDate }) => {
   const [loading, setLoading] = useState(true);
   const [selectedStartTime, setSelectedStartTime] = useState(null);
   const [hoveredBlock, setHoveredBlock] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const hoursContainerRef = useRef(null);
 
   useEffect(() => {
@@ -31,6 +32,7 @@ const CalendarDay = ({ calendarDate }) => {
   const fetchEvents = async () => {
     try {
       setLoading(true);
+      setEvents([]);
       const data = await fetchEventsByDate(calendarDate);
       const processedEvents = findOverlappingEvents(data || []);
       setEvents(processedEvents);
@@ -45,12 +47,17 @@ const CalendarDay = ({ calendarDate }) => {
     setError(null);
   };
 
-  const handleSaveEvent = () => {
+  const handleSaveEvent = async (newEvent) => {
+    if (selectedEvent) {
+      // clear selected event
+      setSelectedEvent(null);
+    }
     fetchEvents();
   };
 
   const handleBlockClick = (hour) => {
     const formattedHour = hour.toString().padStart(2, '0') + ':00';
+    setSelectedEvent(null);
     setSelectedStartTime(formattedHour);
   };
 
@@ -65,6 +72,10 @@ const CalendarDay = ({ calendarDate }) => {
   const handleMouseOverEvent = (event) => {
     event.stopPropagation();
     setHoveredBlock(null);
+  };
+
+  const handleEventClick = (event) => {
+    setSelectedEvent(event);
   };
 
   const formattedDate = calendarDate.toLocaleDateString('en-US', {
@@ -95,6 +106,7 @@ const CalendarDay = ({ calendarDate }) => {
             }}
             onMouseOver={handleMouseOverEvent}
             onMouseLeave={(e) => e.stopPropagation()}
+            handleClick={() => handleEventClick(event)}
           />
         );
       });
@@ -125,7 +137,8 @@ const CalendarDay = ({ calendarDate }) => {
         <div className="date">{formattedDate}</div>
         <EventInput 
           onSave={handleSaveEvent} 
-          defaultStartTime={selectedStartTime} 
+          defaultStartTime={selectedStartTime}
+          selectedEvent={selectedEvent} 
           onError={setError} 
           setLoading={setLoading}
         />
